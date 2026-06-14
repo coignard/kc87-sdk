@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            fasmg_bin: ./fasmg/core/fasmg.x64
+          - os: windows-latest
+            fasmg_bin: ./fasmg/core/fasmg.exe
+          - os: macos-latest
+            fasmg_bin: ./fasmg/core/source/macos/x64/fasmg
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Make fasmg executable
+      if: runner.os != 'Windows'
+      run: chmod +x ${{ matrix.fasmg_bin }}
+
+    - name: Assemble examples
+      shell: bash
+      env:
+        INCLUDE: ${{ github.workspace }}/fasmg/packages
+      run: |
+        for file in examples/*.asm; do
+          echo "Assembling $file"
+          ${{ matrix.fasmg_bin }} "$file"
+        done
