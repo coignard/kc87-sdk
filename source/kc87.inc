@@ -1,5 +1,5 @@
 
-;  This file is part of KC87 SDK.
+;  This file is part of KC 87 SDK.
 ;
 ;  Copyright (c) 2026 René Coignard
 ;
